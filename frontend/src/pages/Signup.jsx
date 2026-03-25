@@ -1,0 +1,54 @@
+import { useContext, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../context/AuthContext'
+
+export default function Signup() {
+  const { doSignup, loading } = useContext(AuthContext)
+  const navigate = useNavigate()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    try {
+      await doSignup(email, password)
+      navigate('/')
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Signup failed')
+    }
+  }
+
+  return (
+    <div className="app-container">
+      <div className="card section">
+        <div className="page-title">Signup</div>
+        {error ? <div className="error" style={{ marginBottom: 12 }}>{error}</div> : null}
+
+        <form onSubmit={onSubmit}>
+          <div className="field">
+            <label>Email</label>
+            <input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+          </div>
+
+          <div className="field" style={{ marginTop: 12 }}>
+            <label>Password</label>
+            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" />
+          </div>
+
+          <div className="row" style={{ marginTop: 14 }}>
+            <button className="btn" type="button" onClick={() => navigate('/login')} disabled={loading}>
+              Go to Login
+            </button>
+            <button className="btn btn-primary" type="submit" disabled={loading}>
+              {loading ? 'Creating account...' : 'Signup'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
